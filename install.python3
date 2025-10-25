@@ -67,7 +67,9 @@ if __name__ == "__main__":
         sys.exit(1)
     
     printc("XUI", col.OKGREEN, 2)
-    rHost = "127.0.0.1" ; rServerID = 1 ; rUsername = generate() ; rPassword = generate()
+    rUsername = input("Inserte el usuario MYSQL: ") or "root"
+    rPassword = input("Inserte la contraseña MYSQL: ") or generate()
+    rHost = "127.0.0.1" ; rServerID = 1
     rDatabase = "xui"
     rPort = 3306
 
@@ -164,16 +166,26 @@ if __name__ == "__main__":
     os.system('sudo mysql -u root%s -e "DROP DATABASE IF EXISTS xui; CREATE DATABASE IF NOT EXISTS xui;"  >/dev/null 2>&1' % rExtra)
     os.system('sudo mysql -u root%s -e "DROP DATABASE IF EXISTS xui_migrate; CREATE DATABASE IF NOT EXISTS xui_migrate;"  >/dev/null 2>&1' % rExtra)
     os.system('sudo mysql -u root%s xui < "/home/xui/bin/install/database.sql"  >/dev/null 2>&1' % rExtra)
-    os.system('sudo mysql -u root%s -e "CREATE USER \'%s\'@\'localhost\' IDENTIFIED BY \'%s\';"  >/dev/null 2>&1' % (rExtra, rUsername, rPassword))
-    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON xui.* TO \'%s\'@\'localhost\';"  >/dev/null 2>&1' % (rExtra, rUsername))
-    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON xui_migrate.* TO \'%s\'@\'localhost\';"  >/dev/null 2>&1' % (rExtra, rUsername))
-    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON mysql.* TO \'%s\'@\'localhost\';"  >/dev/null 2>&1' % (rExtra, rUsername))
-    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON xui.* TO \'%s\'@\'localhost\';"  >/dev/null 2>&1' % (rExtra, rUsername))
-    os.system('sudo mysql -u root%s -e "CREATE USER \'%s\'@\'127.0.0.1\' IDENTIFIED BY \'%s\';"  >/dev/null 2>&1' % (rExtra, rUsername, rPassword))
-    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON xui.* TO \'%s\'@\'127.0.0.1\';"  >/dev/null 2>&1' % (rExtra, rUsername))
-    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON xui_migrate.* TO \'%s\'@\'127.0.0.1\';"  >/dev/null 2>&1' % (rExtra, rUsername))
-    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON mysql.* TO \'%s\'@\'127.0.0.1\';"  >/dev/null 2>&1' % (rExtra, rUsername))
-    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON xui.* TO \'%s\'@\'127.0.0.1\';"  >/dev/null 2>&1' % (rExtra, rUsername))
+     # CONFIGURACION DE PERMISOS CONEXION LOCALES
+    os.system('sudo mysql -u root%s -e "CREATE USER IF NOT EXISTS \'%s\'@\'localhost\' IDENTIFIED BY \'%s\';"' % (rExtra, rUsername, rPassword))
+    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON *.* TO \'%s\'@\'localhost\';"' % (rExtra, rUsername))
+    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON *.* TO \'%s\'@\'localhost\';"' % (rExtra, rUsername))
+    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON xui.* TO \'%s\'@\'localhost\';"' % (rExtra, rUsername)) 
+    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON xui.* TO \'%s\'@\'localhost\';"' % (rExtra, rUsername))
+    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON xui_migrate.* TO \'%s\'@\'localhost\';"' % (rExtra, rUsername)) 
+    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON xui_migrate.* TO \'%s\'@\'localhost\';"' % (rExtra, rUsername))
+    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON mysql.* TO \'%s\'@\'localhost\';"' % (rExtra, rUsername)) 
+    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON mysql.* TO \'%s\'@\'localhost\';"' % (rExtra, rUsername))
+    # CONFIGURACION DE PERMISOS CONEXION REMOTA
+    os.system('sudo mysql -u root%s -e "CREATE USER IF NOT EXISTS \'%s\'@\'%%\' IDENTIFIED BY \'%s\';"' % (rExtra, rUsername, rPassword))
+    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON *.* TO \'%s\'@\'%%\';"' % (rExtra, rUsername)) 
+    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON *.* TO \'%s\'@\'%%\';"' % (rExtra, rUsername))
+    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON xui.* TO \'%s\'@\'%%\';"' % (rExtra, rUsername))
+    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON xui.* TO \'%s\'@\'%%\';"' % (rExtra, rUsername))
+    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON xui_migrate.* TO \'%s\'@\'%%\';"' % (rExtra, rUsername))
+    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON xui_migrate.* TO \'%s\'@\'%%\';"' % (rExtra, rUsername))
+    os.system('sudo mysql -u root%s -e "GRANT ALL PRIVILEGES ON mysql.* TO \'%s\'@\'%%\';"' % (rExtra, rUsername)) 
+    os.system('sudo mysql -u root%s -e "GRANT GRANT OPTION ON mysql.* TO \'%s\'@\'%%\';"' % (rExtra, rUsername))
     os.system('sudo mysql -u root%s -e "FLUSH PRIVILEGES;"  >/dev/null 2>&1' % rExtra)
     rConfigData = rConfig % (rUsername, rPassword)
     rFile = io.open("/home/xui/config/config.ini", "w", encoding="utf-8")
